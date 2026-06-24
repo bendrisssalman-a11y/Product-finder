@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Product Finder</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+    }
+
+    input {
+      width: 80%;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 18px;
+      margin-top: 10px;
+      background: #2d6cdf;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .card {
+      background: white;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      text-align: left;
+    }
+
+    .small {
+      font-size: 12px;
+      color: gray;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Smart Product Finder</h1>
+
+  <input id="query" placeholder="e.g. gaming laptop under 1000" />
+  <br>
+  <button onclick="findProduct()">Find Best Matches</button>
+
+  <div id="result"></div>
+
+  <hr>
+
+  <h2>Mini Dashboard</h2>
+  <button onclick="showDashboard()">Refresh Dashboard</button>
+
+  <div id="dashboard"></div>
+
+</div>
+
+<script>
+/* ---------------- DATABASE ---------------- */
+
+const products = [
+  {
+    name: "Gaming Laptop Pro",
+    price: 1200,
+    category: "gaming",
+    tags: ["gaming", "laptop", "performance"],
+    quality: 5,
+    link: "https://example.com/laptop"
+  },
+  {
+    name: "Budget Gaming Headset",
+    price: 49,
+    category: "gaming",
+    tags: ["cheap", "audio", "headset"],
+    quality: 3,
+    link: "https://example.com/headset"
+  },
+  {
+    name: "Work Laptop Ultra",
+    price: 900,
+    category: "work",
+    tags: ["work", "productivity", "laptop"],
+    quality: 4,
+    link: "https://example.com/worklaptop"
+  },
+  {
+    name: "Fitness Smart Band",
+    price: 79,
+    category: "fitness",
+    tags: ["fitness", "health", "tracker"],
+    quality: 3,
+    link: "https://example.com/band"
+  }
+];
+
+/* ---------------- AI STYLE ENGINE ---------------- */
+
+function findProduct() {
+
+  const input = document.getElementById("query").value.toLowerCase();
+
+  let results = products.map(p => {
+
+    let score = 0;
+
+    if (input.includes(p.category)) score += 10;
+
+    if (input.includes("cheap") && p.price < 100) score += 5;
+    if (input.includes("under 100") && p.price < 100) score += 5;
+    if (input.includes("under 1000") && p.price < 1000) score += 5;
+
+    p.tags.forEach(tag => {
+      if (input.includes(tag)) score += 3;
+    });
+
+    score += p.quality;
+
+    return { ...p, score };
+  });
+
+  results.sort((a, b) => b.score - a.score);
+
+  showResults(results.slice(0, 3));
+}
+
+/* ---------------- DISPLAY RESULTS ---------------- */
+
+function showResults(results) {
+
+  let html = "";
+
+  results.forEach(p => {
+    html += `
+      <div class="card">
+        <h2>${p.name}</h2>
+        <p>Price: $${p.price}</p>
+        <p class="small">Score: ${p.score}</p>
+
+        <a href="${p.link}" target="_blank"
+           onclick="trackClick('${p.name}', ${p.price})">
+           View Product
+        </a>
+      </div>
+    `;
+  });
+
+  document.getElementById("result").innerHTML = html;
+}
+
+/* ---------------- REVENUE TRACKING ---------------- */
+
+function trackClick(name, price) {
+
+  let data = JSON.parse(localStorage.getItem("analytics")) || {
+    clicks: {},
+    totalClicks: 0,
+    revenue: 0
+  };
+
+  if (!data.clicks[name]) data.clicks[name] = 0;
+
+  data.clicks[name]++;
+  data.totalClicks++;
+  data.revenue += price * 0.01;
+
+  localStorage.setItem("analytics", JSON.stringify(data));
+}
+
+/* ---------------- DASHBOARD ---------------- */
+
+function showDashboard() {
+
+  let data = JSON.parse(localStorage.getItem("analytics"));
+
+  if (!data) {
+    document.getElementById("dashboard").innerHTML = "No data yet.";
+    return;
+  }
+
+  let html = `
+    <div class="card">
+      <h3>Total Clicks: ${data.totalClicks}</h3>
+      <h3>Estimated Revenue: $${data.revenue.toFixed(2)}</h3>
+    </div>
+
+    <div class="card">
+      <h3>Top Products</h3>
+  `;
+
+  for (let p in data.clicks) {
+    html += `<p>${p}: ${data.clicks[p]} clicks</p>`;
+  }
+
+  html += `</div>`;
+
+  document.getElementById("dashboard").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>

@@ -3,86 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Matchmaker Pro</title>
+    <title>Smart Product Matchmaker</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
     <header class="bg-indigo-700 text-white py-12 px-4 text-center">
         <h1 class="text-4xl font-bold mb-4">Smart Product Matchmaker</h1>
-        <div id="search-wrapper" class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-2 flex border border-slate-200 cursor-text">
-            <input type="text" id="searchInput" placeholder="Search products..." class="flex-1 bg-transparent text-slate-900 text-lg px-4 py-3 outline-none">
-            <button id="searchBtn" class="bg-indigo-600 px-8 py-3 rounded-lg font-bold">Search</button>
-        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <aside class="lg:col-span-1 space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="font-bold text-lg mb-4">Filters</h2>
-                <input type="range" id="priceFilter" min="10" max="2000" value="2000" class="w-full">
-                <div id="priceDisplay">$2000</div>
-                <div id="categoryContainer" class="mt-4 space-y-2"></div>
+    <main class="max-w-7xl mx-auto py-8 px-4">
+        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             </div>
-        </aside>
-        
-        <section class="lg:col-span-3">
-            <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-        </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDqiQrLu4um3uX9664x4U00gqvhfzNx7s",
+            authDomain: "product-finder-53966.firebaseapp.com",
+            projectId: "product-finder-53966",
+            storageBucket: "product-finder-53966.firebasestorage.app",
+            messagingSenderId: "415485248573",
+            appId: "1:415485248573:web:1bf2189eb6f489850ad654"
+        };
 
-// Your web app's Firebase configuration
-function renderProducts(list) {
-    const grid = document.getElementById('resultsGrid');
-    
-    // This part is the "template" - change the HTML here!
-    grid.innerHTML = list.map(p => `
-        <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200 transition hover:shadow-lg">
-            <h3 class="font-bold text-xl text-slate-800">${p.name}</h3>
-            <p class="text-indigo-600 text-lg font-semibold mt-2">$${p.price}</p>
-            <p class="text-sm text-slate-500 mt-1 uppercase tracking-wider">${p.category}</p>
-            <div class="mt-4 pt-4 border-t border-slate-100 text-sm font-medium">
-                Rating: ${p.rating} / 5.0
-            </div>
-        </div>
-    `).join('');
-}
-
-// Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         async function loadData() {
-            const querySnapshot = await getDocs(collection(db, "products"));
-            products = [];
-            querySnapshot.forEach((doc) => {
-                products.push(doc.data());
-            });
-            renderProducts(products);
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                const grid = document.getElementById('resultsGrid');
+                grid.innerHTML = ''; // Clear loading state
+                
+                querySnapshot.forEach((doc) => {
+                    const p = doc.data();
+                    grid.innerHTML += `
+                        <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+                            <h3 class="font-bold text-xl">${p.name || 'No Name'}</h3>
+                            <p class="text-indigo-600 font-bold mt-2">$${p.price || '0'}</p>
+                            <p class="text-sm text-slate-500">${p.category || 'General'}</p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error loading products: ", error);
+            }
         }
-
-        function renderProducts(list) {
-            const grid = document.getElementById('resultsGrid');
-            grid.innerHTML = list.map(p => `
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="font-bold">${p.name}</h3>
-                    <p>$${p.price}</p>
-                </div>
-            `).join('');
-        }
-
-        document.getElementById('searchBtn').addEventListener('click', () => {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
-            renderProducts(filtered);
-        });
 
         loadData();
     </script>

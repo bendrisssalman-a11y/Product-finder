@@ -6,205 +6,78 @@
     <title>Smart Matchmaker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 min-h-screen">
 
-    <header class="bg-indigo-700 text-white py-12 px-4 text-center shadow-md">
-        <h1 class="text-4xl font-bold mb-4 tracking-tight">Smart Product Matchmaker</h1>
-        <p class="text-lg max-w-2xl mx-auto opacity-90 mb-8">
-            Stop scrolling through junk. Tell us what you need and our engine will rank the best products for you.
-        </p>
-        
-        <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-2 flex border border-slate-200 cursor-text" onclick="document.getElementById('searchInput').focus()">
-            <div class="flex items-center pl-4 pr-2 text-slate-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            <input type="text" id="searchInput" 
-                placeholder="Search for laptops, fitness gear, art supplies..." 
-                class="flex-1 w-full bg-transparent text-slate-900 text-lg px-2 py-3 outline-none placeholder-slate-400">
-            <button id="searchBtn" class="bg-indigo-600 hover:bg-indigo-800 text-white font-bold px-8 py-3 rounded-lg transition-colors">
-                Search
-            </button>
+    <header class="bg-indigo-700 text-white py-12 px-4 text-center">
+        <h1 class="text-4xl font-bold mb-4">Smart Product Matchmaker</h1>
+        <div id="search-wrapper" class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-2 flex border border-slate-200 cursor-text">
+            <input type="text" id="searchInput" placeholder="Search products..." class="flex-1 bg-transparent text-slate-900 text-lg px-4 py-3 outline-none">
+            <button id="searchBtn" class="bg-indigo-600 px-8 py-3 rounded-lg font-bold">Search</button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-4 gap-8 w-full flex-1">
-        
+    <main class="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <aside class="lg:col-span-1 space-y-6">
-            
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="font-bold text-lg text-indigo-700 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Smart Match
-                </h2>
-                <label class="block text-sm font-semibold text-slate-600 mb-2">Who is this for?</label>
-                <select id="personaSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <option value="anyone">Anyone (General)</option>
-                    <option value="student">Student / Academic</option>
-                    <option value="fitness">Fitness Enthusiast</option>
-                    <option value="gamer">Gamer / Techie</option>
-                    <option value="creative">Creative / Artist</option>
-                </select>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="font-bold text-lg mb-4 text-slate-800">Filters</h2>
-                
-                <div class="mb-6">
-                    <div class="flex justify-between items-end mb-2">
-                        <label class="text-sm font-semibold text-slate-600">Max Budget</label>
-                        <div class="text-lg font-bold text-indigo-600" id="priceDisplay">$2000</div>
-                    </div>
-                    <input type="range" min="10" max="2000" value="2000" class="w-full cursor-pointer accent-indigo-600" id="priceFilter">
-                </div>
-
-                <div>
-                    <label class="text-sm font-semibold text-slate-600 mb-3 block">Categories</label>
-                    <div id="categoryContainer" class="space-y-2">
-                        </div>
-                </div>
+                <h2 class="font-bold text-lg mb-4">Filters</h2>
+                <input type="range" id="priceFilter" min="10" max="2000" value="2000" class="w-full">
+                <div id="priceDisplay">$2000</div>
+                <div id="categoryContainer" class="mt-4 space-y-2"></div>
             </div>
         </aside>
-
-        <section class="lg:col-span-3 flex flex-col">
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-sm font-medium text-slate-600 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm" id="resultsCount">
-                    Loading...
-                </div>
-                <select id="sortSelect" class="border border-slate-300 rounded-lg px-4 py-2 text-sm bg-white font-medium outline-none cursor-pointer">
-                    <option value="relevance">Sort by: Smart Match</option>
-                    <option value="priceLow">Price: Low to High</option>
-                    <option value="priceHigh">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
-                </select>
-            </div>
-
-            <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                </div>
+        
+        <section class="lg:col-span-3">
+            <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
         </section>
     </main>
 
-    <script>
-        // Safely enclosed script to prevent full-page crashes
-        document.addEventListener("DOMContentLoaded", () => {
-            const database = [
-                { id: 1, name: "MacBook Air M3", price: 1099.00, category: "Tech", rating: 4.9, reviews: 12500, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80", description: "Incredible battery life and performance. Perfect for campus life or creative work.", tags: ["student", "creative"] },
-                { id: 2, name: "Acer Nitro 5", price: 850.00, category: "Tech", rating: 4.4, reviews: 3200, image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80", description: "Budget-friendly gaming laptop with a dedicated GPU for AAA games.", tags: ["gamer"] },
-                { id: 3, name: "Adjustable Dumbbell Set", price: 199.99, category: "Fitness", rating: 4.7, reviews: 8400, image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?auto=format&fit=crop&w=600&q=80", description: "Replaces 15 sets of weights. Perfect for home gym setups in small spaces.", tags: ["fitness"] },
-                { id: 4, name: "Sony WH-1000XM5", price: 348.00, category: "Audio", rating: 4.8, reviews: 22000, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=600&q=80", description: "Industry-leading noise cancellation. Ideal for studying or commuting.", tags: ["student", "creative", "gamer"] },
-                { id: 5, name: "Premium Thick Yoga Mat", price: 35.00, category: "Fitness", rating: 4.9, reviews: 5400, image: "https://images.unsplash.com/photo-1593164842264-854604db2260?auto=format&fit=crop&w=600&q=80", description: "Non-slip, eco-friendly mat with extra cushioning for joints and daily stretching.", tags: ["fitness", "student"] }
-            ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-            const priceFilter = document.getElementById('priceFilter');
-            const priceDisplay = document.getElementById('priceDisplay');
-            const personaSelect = document.getElementById('personaSelect');
-            const sortSelect = document.getElementById('sortSelect');
-            const categoryContainer = document.getElementById('categoryContainer');
-            const resultsGrid = document.getElementById('resultsGrid');
-            const resultsCount = document.getElementById('resultsCount');
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-            // 1. Build Categories Safely
-            const categories = [...new Set(database.map(p => p.category))];
-            categoryContainer.innerHTML = '';
-            categories.forEach(cat => {
-                categoryContainer.innerHTML += `
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" value="${cat}" class="category-checkbox w-4 h-4 text-indigo-600 rounded" checked>
-                        <span class="text-sm text-slate-700">${cat}</span>
-                    </label>
-                `;
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCDqiQrLu4um3uX9664x4U0OgqvhfzNx7s",
+  authDomain: "product-finder-53966.firebaseapp.com",
+  projectId: "product-finder-53966",
+  storageBucket: "product-finder-53966.firebasestorage.app",
+  messagingSenderId: "415485248573",
+  appId: "1:415485248573:web:1bf2189eb6f489850ad654"
+};
+
+// Initialize Firebase
+
+        async function loadData() {
+            const querySnapshot = await getDocs(collection(db, "products"));
+            products = [];
+            querySnapshot.forEach((doc) => {
+                products.push(doc.data());
             });
+            renderProducts(products);
+        }
 
-            // 2. The Core Brain function
-            function runEngine() {
-                const query = searchInput.value.toLowerCase();
-                const maxPrice = parseFloat(priceFilter.value);
-                const persona = personaSelect.value;
-                const sortMethod = sortSelect.value;
-                
-                // Get checked categories safely
-                const checkBoxes = document.querySelectorAll('.category-checkbox:checked');
-                const activeCategories = Array.from(checkBoxes).map(box => box.value);
+        function renderProducts(list) {
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = list.map(p => `
+                <div class="bg-white p-4 rounded-xl shadow">
+                    <h3 class="font-bold">${p.name}</h3>
+                    <p>$${p.price}</p>
+                </div>
+            `).join('');
+        }
 
-                // Filter Data
-                let results = database.filter(product => {
-                    const matchesSearch = product.name.toLowerCase().includes(query) || product.category.toLowerCase().includes(query);
-                    const matchesPrice = product.price <= maxPrice;
-                    const matchesCategory = activeCategories.includes(product.category);
-                    return matchesSearch && matchesPrice && matchesCategory;
-                });
-
-                // Smart Score Data
-                results = results.map(product => {
-                    let score = (product.rating * 2);
-                    if (persona !== 'anyone' && product.tags.includes(persona)) score += 50;
-                    return { ...product, score };
-                });
-
-                // Sort Data
-                results.sort((a, b) => {
-                    if (sortMethod === 'relevance') return b.score - a.score;
-                    if (sortMethod === 'priceLow') return a.price - b.price;
-                    if (sortMethod === 'priceHigh') return b.price - a.price;
-                    if (sortMethod === 'rating') return b.rating - a.rating;
-                });
-
-                renderCards(results);
-            }
-
-            // 3. Render function
-            function renderCards(results) {
-                resultsCount.innerHTML = `<span class="font-bold">${results.length}</span> Matches Found`;
-                resultsGrid.innerHTML = ''; 
-
-                if(results.length === 0) {
-                    resultsGrid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 font-bold text-xl">No products match your filters.</div>`;
-                    return;
-                }
-
-                results.forEach((product) => {
-                    resultsGrid.innerHTML += `
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                            <div class="h-48 overflow-hidden bg-slate-100">
-                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="p-5 flex flex-col flex-1">
-                                <span class="text-xs font-bold uppercase text-indigo-600 mb-1">${product.category}</span>
-                                <h3 class="font-bold text-lg text-slate-900 mb-2">${product.name}</h3>
-                                <p class="text-sm text-slate-600 mb-4 line-clamp-2">${product.description}</p>
-                                
-                                <div class="flex items-center justify-between mt-auto mb-4">
-                                    <span class="text-slate-700 font-medium text-sm flex items-center">
-                                        <span class="text-amber-500 mr-1">★</span> ${product.rating}
-                                    </span>
-                                    <span class="font-black text-xl text-slate-900">$${product.price.toFixed(2)}</span>
-                                </div>
-                                <button class="w-full bg-slate-900 hover:bg-indigo-600 text-white py-2.5 rounded-lg font-bold transition-colors">
-                                    View Deal
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            // 4. Attach Event Listeners so everything updates LIVE
-            searchInput.addEventListener('input', runEngine);
-            searchBtn.addEventListener('click', runEngine);
-            priceFilter.addEventListener('input', (e) => {
-                priceDisplay.textContent = '$' + e.target.value;
-                runEngine();
-            });
-            personaSelect.addEventListener('change', runEngine);
-            sortSelect.addEventListener('change', runEngine);
-            
-            // Listen to dynamic checkboxes
-            categoryContainer.addEventListener('change', runEngine);
-
-            // 5. Run once on load to fill the screen
-            runEngine();
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
         });
+
+        loadData();
     </script>
 </body>
 </html>

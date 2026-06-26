@@ -3,106 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Universal Finder Pro</title>
+    <title>Smart Matchmaker Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom spinner for simulated API loading */
-        .loader { border-top-color: #3b82f6; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-indigo-200">
 
-    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-12 px-4 text-center shadow-md">
-        <h1 class="text-4xl font-bold mb-4 tracking-tight">Smart Product Matchmaker</h1>
-        <p class="text-lg max-w-2xl mx-auto opacity-90">
-            Stop scrolling through junk. Tell us what you need and who you are, and our engine will rank the best products for you.
-        </p>
+    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform scale-95 transition-transform duration-500" id="modalContent">
+            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-4">How Our Smart Engine Works</h2>
+            <p class="text-slate-600 mb-4">We don't just show random products. Our engine uses a dual-filter system to find your perfect match:</p>
+            <ul class="space-y-4 mb-8">
+                <li class="flex items-start">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs mr-3 mt-0.5">1</span>
+                    <p class="text-sm text-slate-700"><strong>Hard Filters:</strong> Set your budget and categories to strictly remove what you don't want.</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs mr-3 mt-0.5">2</span>
+                    <p class="text-sm text-slate-700"><strong>Smart Score:</strong> Tell us your persona, age, and usage. We boost the products that perfectly fit your lifestyle to the top!</p>
+                </li>
+            </ul>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-indigo-500/30 transform hover:-translate-y-0.5">
+                Got it, let's search!
+            </button>
+        </div>
+    </div>
+
+    <header class="relative bg-slate-900 text-white pt-16 pb-20 px-4 overflow-hidden shadow-2xl">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600 rounded-full blur-[120px] opacity-30 pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl font-extrabold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white to-indigo-300">
+                Find Exactly What You Need.
+            </h1>
+            
+            <div class="relative max-w-3xl mx-auto mt-8 group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="w-6 h-6 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" id="searchInput" 
+                    placeholder="Search for laptops, fitness gear, art supplies..." 
+                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-slate-300 focus:bg-white focus:text-slate-900 focus:placeholder-slate-500 outline-none ring-4 ring-transparent focus:ring-indigo-500/30 transition-all text-lg shadow-xl">
+            </div>
+        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-4 gap-8 flex-1 w-full">
+    <main class="max-w-[1400px] mx-auto py-8 px-4 grid grid-cols-1 lg:grid-cols-4 gap-8 w-full -mt-10 relative z-20">
         
-        <aside class="lg:col-span-1 space-y-6">
-            
-            <div class="bg-gray-200 h-64 rounded-xl flex flex-col items-center justify-center text-gray-500 border border-gray-300 shadow-inner">
-                <span class="text-xs uppercase tracking-widest mb-2">Advertisement</span>
-                <span class="text-sm text-center px-4">Google AdSense Script Goes Here</span>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <h2 class="font-bold text-lg mb-4 text-indigo-700 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Smart Match
-                </h2>
-                <label class="block text-sm font-medium text-gray-600 mb-2">Who is this for?</label>
-                <select id="personaSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50">
-                    <option value="anyone">Anyone (General Search)</option>
-                    <option value="student">College Student</option>
-                    <option value="fitness">Fitness Enthusiast</option>
-                    <option value="gamer">Hardcore Gamer</option>
-                    <option value="artist">Creative / Artist</option>
-                </select>
-                <p class="text-xs text-gray-400 mt-2">Our algorithm will boost items matching this lifestyle.</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <h2 class="font-bold text-lg mb-4 text-gray-800">Hard Filters</h2>
+        <aside class="lg:col-span-1">
+            <div class="sticky top-8 space-y-6">
                 
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-600 mb-2">Max Budget</label>
-                    <input type="range" min="10" max="2000" value="2000" class="w-full cursor-pointer accent-blue-600" id="priceFilter">
-                    <div class="text-right text-lg font-bold text-blue-600 mt-1" id="priceDisplay">$2000</div>
+                <div class="glass-panel p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-5">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="font-bold text-lg text-slate-800">Smart Match</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Persona</label>
+                            <select id="personaSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow">
+                                <option value="anyone">Anyone (General)</option>
+                                <option value="student">Student / Academic</option>
+                                <option value="fitness">Fitness Enthusiast</option>
+                                <option value="gamer">Gamer / Techie</option>
+                                <option value="creative">Creative / Artist</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Age Group</label>
+                            <select id="ageSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow">
+                                <option value="any">Any Age</option>
+                                <option value="kids">Kids & Pre-teens</option>
+                                <option value="teens">Teenagers</option>
+                                <option value="adults">Adults</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Usage Intensity</label>
+                            <select id="intensitySelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-shadow">
+                                <option value="any">Any Intensity</option>
+                                <option value="casual">Casual / Occasional</option>
+                                <option value="daily">Daily Driver</option>
+                                <option value="pro">Heavy / Professional</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-6">
-                    <h3 class="text-sm font-medium text-gray-600 mb-3">Categories</h3>
-                    <div id="categoryContainer" class="space-y-3">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="font-bold text-lg mb-5 text-slate-800">Filters</h2>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Max Budget</label>
+                            <div class="text-lg font-black text-indigo-600" id="priceDisplay">$2000</div>
                         </div>
+                        <input type="range" min="10" max="2000" value="2000" class="w-full cursor-pointer accent-indigo-600 h-2 bg-slate-200 rounded-lg appearance-none" id="priceFilter">
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 block">Categories</label>
+                        <div id="categoryContainer" class="space-y-2.5 max-h-[200px] overflow-y-auto pr-2">
+                            </div>
+                    </div>
                 </div>
             </div>
         </aside>
 
-        <section class="lg:col-span-3 flex flex-col">
-            
-            <div class="flex gap-3 mb-6 bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-                <input type="text" id="searchInput" 
-                    placeholder="Search by keyword (e.g., laptop, weights, canvas)..." 
-                    class="flex-1 px-4 py-2 bg-transparent focus:outline-none text-lg">
-                <button onclick="triggerSearch()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-bold transition-colors shadow-md">
-                    Search
-                </button>
-            </div>
-
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-sm font-medium text-gray-500 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm" id="resultsCount">
-                    Awaiting search...
+        <section class="lg:col-span-3 flex flex-col pt-8 lg:pt-0">
+            <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <div class="text-sm font-medium text-slate-500 bg-white px-5 py-2.5 rounded-full border border-slate-200 shadow-sm flex items-center" id="resultsCount">
+                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                    Loading matches...
                 </div>
-                <select id="sortSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white outline-none">
-                    <option value="relevance">Sort by: Smart Relevance</option>
+                <select id="sortSelect" class="border border-slate-200 rounded-full px-5 py-2.5 text-sm bg-white font-medium text-slate-700 outline-none shadow-sm hover:border-indigo-300 transition-colors cursor-pointer">
+                    <option value="relevance">Sort by: Smart Match</option>
                     <option value="priceLow">Price: Low to High</option>
                     <option value="priceHigh">Price: High to Low</option>
                     <option value="rating">Highest Rated</option>
                 </select>
             </div>
 
-            <div id="loadingSpinner" class="hidden flex-col items-center justify-center py-20">
-                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
-                <h2 class="text-center text-gray-500 text-xl font-semibold">Querying Database...</h2>
-                <p class="text-gray-400 text-sm mt-2">Running smart match algorithms</p>
-            </div>
-
             <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 </div>
-            
         </section>
     </main>
 
-    <footer class="bg-gray-900 text-gray-400 py-8 text-center mt-auto">
-        <p>&copy; 2026 Smart Finder. <br> <span class="text-xs">As an Amazon Associate I earn from qualifying purchases.</span></p>
-    </footer>
-
     <script>
-        // PROBLEM 2 FIX: Architecture ready for a Real Database
-        // This array simulates a database. Notice the "tags" array - this is how AI/Smart search works.
         const database = [
-            { id: 1, name: "MacBook Air M3", price: 1099.00, category: "Tech", rating: 4.9, reviews: 12500, image: "https://images.unsplash.com/photo-15
+            { id: 1, name: "MacBook Air M3", price: 1099.00, category: "Tech", rating: 4.9, reviews: 12500, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80", description: "Incredible battery life and performance. Perfect for campus life or creative work.", tags: ["student", "creative"], ageTags: ["teens", "adults"], intensityTags: ["daily", "pro"], affiliateUrl: "?tag=id" },
+            { id: 2, name: "Acer Nitro 5", price: 850.00, category: "Tech", rating: 4.4, reviews: 3200, image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80", description: "Budget-friendly gaming laptop with a dedicated GPU for AAA games.", tags: ["gamer"], ageTags: ["teens", "adults"], intensityTags: ["daily"], affiliateUrl: "?tag=id" },
+            { id: 3, name: "Adjustable Dumbbell Set", price: 199.99, category: "Fitness", rating: 4.7, reviews: 8400, image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?auto=format&fit=crop&w=600&q=80", description: "Replaces 15 sets of weights. Perfect for home gym setups in small spaces.", tags: ["fitness"], ageTags: ["teens", "adults"], intensityTags: ["daily", "pro"], affiliateUrl: "?tag=id" },
+            { id: 4, name: "Sony WH-1000XM5 Headphones", price: 348.00, category: "Audio", rating: 4.8, reviews: 22000, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=600&q=80", description: "Industry-leading noise cancellation. Ideal for studying or commuting.", tags: ["student", "creative", "gamer"], ageTags: ["teens", "adults"], intensityTags: ["daily", "casual"], affiliateUrl: "?tag=id" },
+            { id: 5, name: "Crayola Inspiration Art Case", price: 25.99, category: "Art", rating: 4.8, reviews: 4500, image: "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?auto=format&fit=crop&w=600&q=80", description: "140-piece art set including crayons, colored pencils, and markers.", tags: ["creative"], ageTags: ["kids"], intensityTags: ["casual"], affiliateUrl: "?tag=id" },
+            { id: 6, name: "Wacom Cintiq Pro 16", price: 1499.99, category: "Tech", rating: 4.6, reviews: 1100, image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80", description: "Professional pen display with 4K resolution for serious digital artists.", tags: ["creative"], ageTags: ["adults"], intensityTags: ["pro"], affiliateUrl: "?tag=id" },
+            { id: 7, name: "Premium Thick Yoga Mat", price: 35.00, category: "Fitness", rating: 4.9, reviews: 5400, image: "https://images.unsplash.com/photo-1593164842264-854604db2260?auto=format&fit=crop&w=600&q=80", description: "Non-slip, eco-friendly mat with extra cushioning for joints and daily stretching.", tags: ["fitness", "student"], ageTags: ["kids", "teens", "adults"], intensityTags: ["casual", "daily"], affiliateUrl: "?tag=id" }
+        ];
+
+        const elements = {
+            search: document.getElementById('searchInput'),
+            price: document.getElementById('priceFilter'),
+            priceDisplay: document.getElementById('priceDisplay'),
+            persona: document.getElementById('personaSelect'),
+            age: document.getElementById('ageSelect'),
+            intensity: document.getElementById('intensitySelect'),
+            sort: document.getElementById('sortSelect'),
+            grid: document.getElementById('resultsGrid'),
+            catContainer: document.getElementById('categoryContainer'),
+            count: document.getElementById('resultsCount')
+        };
+
+        function init() {
+            // Trigger Welcome Modal smoothly on load
+            setTimeout(() => {
+                const modal = document.getElementById('welcomeModal');
+                const modalContent = document.getElementById('modalContent');
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 500);
+
+            const categories = [...new Set(database.map(p => p.category))];
+            categories.forEach(cat => {
+                elements.catContainer.innerHTML += `
+                    <label class="flex items-center space-x-3 cursor-pointer group p-1 rounded hover:bg-slate-50 transition-colors">
+                        <input type="checkbox" value="${cat}" class="category-checkbox w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all" checked>
+                        <span class="text-sm text-slate-700 font-medium group-hover:text-indigo-600 transition-colors">${cat}</span>
+                    </label>
+                `;
+            });
+
+            elements.search.addEventListener('input', processData);
+            elements.price.addEventListener('input', (e) => {
+                elements.priceDisplay.textContent = '$' + e.target.value;
+                processData();
+            });
+            
+            elements.persona.addEventListener('change', processData);
+            elements.age.addEventListener('change', processData);
+            elements.intensity.addEventListener('change', processData);
+            elements.sort.addEventListener('change', processData);
+            elements.catContainer.addEventListener('change', processData);
+
+            processData();
+        }
+
+        // Close Modal Function
+        function closeModal() {
+            const modal = document.getElementById('welcomeModal');
+            const modalContent = document.getElementById('modalContent');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+        }
+
+        function processData() {
+            const query = elements.search.value.toLowerCase();
+            const maxPrice = parseFloat(elements.price.value);
+            const persona = elements.persona.value;
+            const age = elements.age.value;
+            const intensity = elements.intensity.value;
+            const sortMethod = elements.sort.value;
+            
+            const activeCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(box => box.value);
+
+            let results = database.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(query) || product.description.toLowerCase().includes(query) || product.category.toLowerCase().includes(query);
+                const matchesPrice = product.price <= maxPrice;
+                const matchesCategory = activeCategories.includes(product.category);
+                return matchesSearch && matchesPrice && matchesCategory;
+            });
+
+            results = results.map(product => {
+                let score = 0;
+                if (persona !== 'anyone' && product.tags.includes(persona)) score += 50;
+                if (age !== 'any' && product.ageTags.includes(age)) score += 30;
+                if (intensity !== 'any' && product.intensityTags.includes(intensity)) score += 30;
+                
+                score += (product.rating * 2); 
+                return { ...product, relevanceScore: score };
+            });
+
+            results.sort((a, b) => {
+                if (sortMethod === 'relevance') return b.relevanceScore - a.relevanceScore;
+                if (sortMethod === 'priceLow') return a.price - b.price;
+                if (sortMethod === 'priceHigh') return b.price - a.price;
+                if (sortMethod === 'rating') return b.rating - a.rating;
+            });
+
+            renderUI(results);
+        }
+
+        function renderUI(results) {
+            elements.count.innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span><span class="font-bold text-slate-800 mr-1">${results.length}</span> Matches Found`;
+            elements.grid.innerHTML = ''; 
+
+            if(results.length === 0) {
+                elements.grid.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-slate-200 border-dashed">
+                    <svg class="w-16 h-16 mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <p class="text-xl font-bold text-slate-700">No matches found</p>
+                    <p class="text-slate-500 mt-2">Try adjusting your filters or search terms.</p>
+                </div>`;
+                return;
+            }
+
+            results.forEach((product) => {
+                const isTopMatch = product.relevanceScore >= 60;
+
+                elements.grid.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col group hover:-translate-y-1">
+                        
+                        <div class="h-56 overflow-hidden relative bg-slate-100">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                            ${isTopMatch ? `
+                                <div class="absolute top-3 left-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center backdrop-blur-sm">
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg> 
+                                    Top Match
+                                </div>` : ''}
+                        </div>
+                        
+                        <div class="p-6 flex flex-col flex-1">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[11px] font-bold uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2 py-1 rounded">${product.category}</span>
+                            </div>
+                            
+                            <h3 class="font-extrabold text-xl text-slate-900 mb-2 leading-tight">${product.name}</h3>
+                            <p class="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed">${product.description}</p>
+                            
+                            <div class="flex flex-col mt-auto">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div class="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-100">
+                                        <span class="text-amber-500 text-sm">★</span>
+                                        <span class="text-amber-700 font-bold text-sm">${product.rating}</span>
+                                        <span class="text-amber-600/60 text-xs">(${product.reviews.toLocaleString()})</span>
+                                    </div>
+                                    <span class="font-black text-2xl text-slate-900 tracking-tight">$${product.price.toFixed(2)}</span>
+                                </div>
+                                
+                                <a href="https://amazon.com/dp/placeholder${product.affiliateUrl}" target="_blank" class="w-full bg-slate-900 hover:bg-indigo-600 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-md hover:shadow-indigo-500/30 flex justify-center items-center group/btn">
+                                    View Deal
+                                    <svg class="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

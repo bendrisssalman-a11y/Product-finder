@@ -41,14 +41,21 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCDqiQrLu4um3uX9664x4U0OgqvhfzNx7s",
-  authDomain: "product-finder-53966.firebaseapp.com",
-  projectId: "product-finder-53966",
-  storageBucket: "product-finder-53966.firebasestorage.app",
-  messagingSenderId: "415485248573",
-  appId: "1:415485248573:web:1bf2189eb6f489850ad654"
-};
+function renderProducts(list) {
+    const grid = document.getElementById('resultsGrid');
+    
+    // This part is the "template" - change the HTML here!
+    grid.innerHTML = list.map(p => `
+        <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200 transition hover:shadow-lg">
+            <h3 class="font-bold text-xl text-slate-800">${p.name}</h3>
+            <p class="text-indigo-600 text-lg font-semibold mt-2">$${p.price}</p>
+            <p class="text-sm text-slate-500 mt-1 uppercase tracking-wider">${p.category}</p>
+            <div class="mt-4 pt-4 border-t border-slate-100 text-sm font-medium">
+                Rating: ${p.rating} / 5.0
+            </div>
+        </div>
+    `).join('');
+}
 
 // Initialize Firebase
 
